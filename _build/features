@@ -1,0 +1,6 @@
+do{ my $x = {
+       'test_url' => 'http://spoomusic.com/albums/wjoo. joo. - Full Moon Yawn/01 - wjoo. joo. - Full Moon Yawn.mp3',
+       'test_file' => 'test_file.mp3',
+       'codegen_found' => 0
+     };
+$x; }

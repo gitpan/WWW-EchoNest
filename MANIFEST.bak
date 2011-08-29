@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/WWW/EchoNest.pm
+MANIFEST
+README
+t/00-load.t
+t/artist.t
+t/boilerplate.t
+t/catalog.t
+t/echonest.t
+t/manifest.t
+t/playlist.t
+t/pod-coverage.t
+t/pod.t
+t/song.t
+t/track.t
+META.yml

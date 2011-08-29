@@ -1,0 +1,8 @@
+do{ my $x = {
+       'debian' => 1,
+       '_build' => 1,
+       'WWW-EchoNest-v0.0.1' => 1,
+       'WWW-EchoNest-*' => 1,
+       'blib' => 1
+     };
+$x; }
