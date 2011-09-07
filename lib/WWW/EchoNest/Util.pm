@@ -13,6 +13,7 @@ use URI::Escape;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTTP::Response;
+use JSON;
 
 use WWW::EchoNest;
 our $VERSION = $WWW::EchoNest::VERSION;
@@ -31,13 +32,6 @@ BEGIN {
 use parent qw[ Exporter ];
 
 
-
-
-# Required CPAN modules
-eval {
-    use JSON;
-};
-croak qq[No JSON module: $@] if $@;
 
 ########################################################################
 #
@@ -103,8 +97,8 @@ sub json_rep {
     $user_agent->default_header( @headers );
     $user_agent->show_progress(1) if get_conf->get_show_progress();
     $user_agent->add_handler(
-                             request_prepare => $request_handler,
-                             response_done   => $response_handler,
+                             request_prepare   => $request_handler,
+                             response_done     => $response_handler,
                             );
 
     sub user_agent     {   return $user_agent              }
@@ -143,10 +137,9 @@ sub json_rep {
         };
         croak "Error decoding JSON: $@" if $@;
 
-        $logger->info(
-                      q/response: /,
-                      json_rep($response_ref),
-                     ) if ($trace_api_calls);
+        $logger->info( 'response: ' . json_rep($response_ref) )
+            if ($trace_api_calls);
+                     
     
         # Fetch the status block, response code, and response message
         my $status_hash_ref    = $response_ref->{'response'}{'status'};
@@ -322,7 +315,7 @@ sub json_rep {
         my $trace_api_calls   = get_conf->get_trace_api_calls();
     
         # Set the api_key
-        $params{ q/api_key/ } = get_conf->get_api_key();
+        $params{api_key} = get_conf->get_api_key();
 
         # Initialize the parameter list
         my @param_list;
@@ -382,10 +375,13 @@ sub json_rep {
                                        Content_Type     => 'form-data',
                                        Content          => \@param_list
                                       );
+                    $logger->debug( json_rep($data) ) if $trace_api_calls;
                     $response = user_agent()->request( $request );
                 } else {
                     push @param_list, @$data if ( ref($data) eq 'ARRAY' );
                     push @param_list, %$data if ( ref($data) eq 'HASH' );
+                    $logger->debug( json_rep($data) )
+                        if $trace_api_calls && ref($data);
                     $response = user_agent()->post( $urlPOST, \@param_list );
                 }
             } else {
@@ -429,7 +425,7 @@ sub json_rep {
             $urlGET->query_form( \@param_list );
         
             # Log the URL if we have enabled TRACE_API_CALLS
-            $logger->info( q/GET / . $urlGET )    if ($trace_api_calls);
+            # $logger->info( q/GET / . $urlGET )    if ($trace_api_calls);
 
             $response = user_agent()->get( $urlGET );
         }
